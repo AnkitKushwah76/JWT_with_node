@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const bcrypt = require("bcryptjs");
+const sendSuccessEmail = require("../mailer/emailService");
 
 // register user
 
@@ -12,7 +13,10 @@ exports.registerUser = async (req, res) => {
   }
   try {
     const user = await User.create({ name, email, password });
-    res.status(201).json(user);
+    if (user) {
+      sendSuccessEmail(user.email);
+      res.status(201).json(user);
+    }
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
